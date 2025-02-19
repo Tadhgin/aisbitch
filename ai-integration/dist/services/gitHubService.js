@@ -13,8 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitHubService = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config(); // ✅ Load environment variables from .env
 const axios_1 = __importDefault(require("axios"));
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''; // Ensure it's set
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''; // Ensure token is defined
 if (!GITHUB_TOKEN) {
     console.warn('⚠️ Warning: GitHub Token is missing. GitHub features will not work.');
 }
@@ -27,6 +29,11 @@ class GitHubService {
     interactWithGitHub(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const { action, repo, filePath, content } = data;
+            // ✅ Basic Validation
+            if (!GITHUB_TOKEN) {
+                console.error('❌ Missing GitHub Token');
+                throw new Error('Missing GitHub token. Please set the GITHUB_TOKEN environment variable.');
+            }
             if (!repo || !filePath || !content) {
                 console.error('❌ Missing required fields');
                 throw new Error('Missing required fields: repo, filePath, and content.');
