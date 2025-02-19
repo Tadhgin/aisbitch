@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config(); // ✅ Load environment variables from .env
+
 import axios from 'axios';
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''; // Ensure it's set
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''; // Ensure token is defined
 
 if (!GITHUB_TOKEN) {
   console.warn('⚠️ Warning: GitHub Token is missing. GitHub features will not work.');
@@ -19,6 +22,12 @@ export class GitHubService {
     content: string;
   }): Promise<any> {
     const { action, repo, filePath, content } = data;
+
+    // ✅ Basic Validation
+    if (!GITHUB_TOKEN) {
+      console.error('❌ Missing GitHub Token');
+      throw new Error('Missing GitHub token. Please set the GITHUB_TOKEN environment variable.');
+    }
 
     if (!repo || !filePath || !content) {
       console.error('❌ Missing required fields');

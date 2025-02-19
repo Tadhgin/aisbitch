@@ -14,28 +14,51 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitHubService = void 0;
 const axios_1 = __importDefault(require("axios"));
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Ensure this is in your .env file
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''; // Ensure it's set
+if (!GITHUB_TOKEN) {
+    console.warn('⚠️ Warning: GitHub Token is missing. GitHub features will not work.');
+}
 class GitHubService {
+    /**
+     * Handles GitHub interactions such as committing files.
+     * @param data Contains action, repo, filePath, and content for commit.
+     * @returns GitHub API response.
+     */
     interactWithGitHub(data) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { action, repo, filePath, content } = data;
+            if (!repo || !filePath || !content) {
+                console.error('❌ Missing required fields');
+                throw new Error('Missing required fields: repo, filePath, and content.');
+            }
+            if (action !== 'commit') {
+                throw new Error('Unsupported action. Only "commit" is currently supported.');
+            }
+            const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+            console.log(`🚀 Sending commit to GitHub: ${url}`);
             try {
-                const { action, repo, filePath, content } = data;
-                if (action === 'commit') {
-                    const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
-                    const response = yield axios_1.default.put(url, {
-                        message: 'AI Commit',
-                        content: Buffer.from(content).toString('base64'),
-                        branch: 'main'
-                    }, {
-                        headers: { Authorization: `token ${GITHUB_TOKEN}` }
-                    });
-                    return response.data;
-                }
-                throw new Error('Unsupported action');
+                const response = yield axios_1.default.put(url, {
+                    message: 'AI Commit',
+                    content: Buffer.from(content).toString('base64'),
+                    branch: 'main',
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${GITHUB_TOKEN}`,
+                        Accept: 'application/vnd.github.v3+json',
+                    },
+                });
+                console.log('✅ GitHub Commit Response:', response.data);
+                return response.data;
             }
             catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                throw new Error(`GitHub interaction failed: ${errorMessage}`);
+                if (error.response) {
+                    console.error('❌ GitHub API Error:', JSON.stringify(error.response.data, null, 2));
+                    throw new Error(`GitHub interaction failed: ${JSON.stringify(error.response.data)}`);
+                }
+                else {
+                    console.error('❌ Unexpected Error:', error.message);
+                    throw new Error(`Unexpected error: ${error.message}`);
+                }
             }
         });
     }
