@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+console.log('GITHUB_TOKEN:', process.env.GITHUB_TOKEN); // Log the GitHub token
 
 import express from 'express';
 import aiRoutes from './routes/aiRoutes';
