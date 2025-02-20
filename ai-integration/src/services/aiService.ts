@@ -19,6 +19,7 @@ export class AIService {
 export class GitHubService {
   public async interactWithGitHub(data: any): Promise<any> {
     console.log('GITHUB_TOKEN:', GITHUB_TOKEN); // Log the GitHub token
+    console.log('GitHub interaction data:', data); // Log the interaction data
 
     const { action, repo, filePath, content } = data;
 
