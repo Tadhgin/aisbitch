@@ -1,7 +1,0 @@
-Flask
-Flask-SocketIO
-Flask-Login
-python-dotenv
-google-cloud-language
-requests
-gitpython
