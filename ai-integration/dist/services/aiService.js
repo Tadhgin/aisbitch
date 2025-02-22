@@ -35,6 +35,7 @@ class GitHubService {
     interactWithGitHub(data) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('GITHUB_TOKEN:', GITHUB_TOKEN); // Log the GitHub token
+            console.log('GitHub interaction data:', data); // Log the interaction data
             const { action, repo, filePath, content } = data;
             if (!GITHUB_TOKEN) {
                 console.error('❌ Missing GitHub Token');

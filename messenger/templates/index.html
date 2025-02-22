@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Chat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" id="theme-stylesheet">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">AI Chat</h1>
+        <div class="form-group">
+            <label for="theme-select">Select Theme:</label>
+            <select id="theme-select" class="form-control">
+                <option value="css/styles.css">Default</option>
+                <option value="css/dark-theme.css">Dark</option>
+                <option value="css/light-theme.css">Light</option>
+            </select>
+        </div>
+        <div id="chat" class="border rounded p-3 mb-3">
+            <!-- Chat messages will appear here -->
+        </div>
+        <input id="message" type="text" class="form-control" placeholder="Type a message...">
+        <button id="send" class="btn btn-primary mt-2">Send</button>
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary mt-2">Logout</a>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            socket.on('message', function(msg) {
+                $('#chat').append('<div class="message"><span class="user">User:</span> <span class="text">' + msg + '</span></div>');
+                $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            });
+
+            $('#send').click(function() {
+                var message = $('#message').val();
+                socket.send(message);
+                $('#message').val('');
+            });
+
+            $('#message').keypress(function(e) {
+                if (e.which == 13) {
+                    $('#send').click();
+                }
+            });
+
+            $('#theme-select').change(function() {
+                var theme = $(this).val();
+                $('#theme-stylesheet').attr('href', '{{ url_for('static', filename='') }}' + theme);
+            });
+        });
+    </script>
+</body>
+</html>
